@@ -1,4 +1,4 @@
-# Rust API client for openapi
+# Rust API client for BtcPayserver
 
 The BTCPay Server Greenfield API is a REST API. Our API has predictable
 resource-oriented URLs, accepts form-encoded request bodies, returns
