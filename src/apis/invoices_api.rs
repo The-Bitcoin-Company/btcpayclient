@@ -9,7 +9,10 @@
  */
 
 use super::{configuration, ContentType, Error};
-use crate::{apis::ResponseContent, models};
+use crate::{
+    apis::{BtcPayError, ResponseContent},
+    models,
+};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
 
@@ -134,112 +137,11 @@ pub struct InvoicesUpdateInvoiceParams {
     pub update_invoice_request: models::UpdateInvoiceRequest,
 }
 
-/// struct for typed errors of method [`invoices_activate_payment_method`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesActivatePaymentMethodError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_archive_invoice`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesArchiveInvoiceError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    Status404(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_create_invoice`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesCreateInvoiceError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_get_invoice`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesGetInvoiceError {
-    Status403(),
-    Status404(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_get_invoice_payment_methods`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesGetInvoicePaymentMethodsError {
-    Status403(),
-    Status404(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_get_invoice_refund_trigger_data`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesGetInvoiceRefundTriggerDataError {
-    Status403(),
-    Status404(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_get_invoices`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesGetInvoicesError {
-    Status401(models::ProblemDetails),
-    DefaultResponse(models::ProblemDetails),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_mark_invoice_status`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesMarkInvoiceStatusError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_refund`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesRefundError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_unarchive_invoice`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesUnarchiveInvoiceError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    UnknownValue(serde_json::Value),
-}
-
-/// struct for typed errors of method [`invoices_update_invoice`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum InvoicesUpdateInvoiceError {
-    Status400(Vec<models::ValidationProblemDetailsInner>),
-    Status403(),
-    Status404(),
-    UnknownValue(serde_json::Value),
-}
-
 /// Activate an invoice payment method (if lazy payments mode is enabled)
 pub async fn invoices_activate_payment_method(
     configuration: &configuration::Configuration,
     params: InvoicesActivatePaymentMethodParams,
-) -> Result<(), Error<InvoicesActivatePaymentMethodError>> {
+) -> Result<(), Error<BtcPayError>> {
     let uri_str = format!("{}/api/v1/stores/{storeId}/invoices/{invoiceId}/payment-methods/{paymentMethodId}/activate", configuration.base_path, invoiceId=crate::apis::urlencode(params.invoice_id), paymentMethodId=crate::apis::urlencode(params.payment_method_id), storeId=crate::apis::urlencode(params.store_id));
     let mut req_builder = configuration
         .client
@@ -269,8 +171,7 @@ pub async fn invoices_activate_payment_method(
         Ok(())
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesActivatePaymentMethodError> =
-            serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -283,7 +184,7 @@ pub async fn invoices_activate_payment_method(
 pub async fn invoices_archive_invoice(
     configuration: &configuration::Configuration,
     params: InvoicesArchiveInvoiceParams,
-) -> Result<(), Error<InvoicesArchiveInvoiceError>> {
+) -> Result<(), Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}",
         configuration.base_path,
@@ -318,7 +219,7 @@ pub async fn invoices_archive_invoice(
         Ok(())
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesArchiveInvoiceError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -331,7 +232,7 @@ pub async fn invoices_archive_invoice(
 pub async fn invoices_create_invoice(
     configuration: &configuration::Configuration,
     params: InvoicesCreateInvoiceParams,
-) -> Result<models::InvoiceData, Error<InvoicesCreateInvoiceError>> {
+) -> Result<models::InvoiceData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices",
         configuration.base_path,
@@ -377,7 +278,7 @@ pub async fn invoices_create_invoice(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesCreateInvoiceError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -390,7 +291,7 @@ pub async fn invoices_create_invoice(
 pub async fn invoices_get_invoice(
     configuration: &configuration::Configuration,
     params: InvoicesGetInvoiceParams,
-) -> Result<models::InvoiceData, Error<InvoicesGetInvoiceError>> {
+) -> Result<models::InvoiceData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}",
         configuration.base_path,
@@ -434,7 +335,7 @@ pub async fn invoices_get_invoice(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesGetInvoiceError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -447,8 +348,7 @@ pub async fn invoices_get_invoice(
 pub async fn invoices_get_invoice_payment_methods(
     configuration: &configuration::Configuration,
     params: InvoicesGetInvoicePaymentMethodsParams,
-) -> Result<Vec<models::InvoicePaymentMethodDataModel>, Error<InvoicesGetInvoicePaymentMethodsError>>
-{
+) -> Result<Vec<models::InvoicePaymentMethodDataModel>, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}/payment-methods",
         configuration.base_path,
@@ -498,8 +398,7 @@ pub async fn invoices_get_invoice_payment_methods(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesGetInvoicePaymentMethodsError> =
-            serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -512,7 +411,7 @@ pub async fn invoices_get_invoice_payment_methods(
 pub async fn invoices_get_invoice_refund_trigger_data(
     configuration: &configuration::Configuration,
     params: InvoicesGetInvoiceRefundTriggerDataParams,
-) -> Result<models::InvoiceRefundTriggerData, Error<InvoicesGetInvoiceRefundTriggerDataError>> {
+) -> Result<models::InvoiceRefundTriggerData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}/refund/{paymentMethodId}",
         configuration.base_path,
@@ -557,8 +456,7 @@ pub async fn invoices_get_invoice_refund_trigger_data(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesGetInvoiceRefundTriggerDataError> =
-            serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -571,7 +469,7 @@ pub async fn invoices_get_invoice_refund_trigger_data(
 pub async fn invoices_get_invoices(
     configuration: &configuration::Configuration,
     params: InvoicesGetInvoicesParams,
-) -> Result<Vec<models::InvoiceData>, Error<InvoicesGetInvoicesError>> {
+) -> Result<Vec<models::InvoiceData>, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices",
         configuration.base_path,
@@ -651,7 +549,7 @@ pub async fn invoices_get_invoices(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesGetInvoicesError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -664,7 +562,7 @@ pub async fn invoices_get_invoices(
 pub async fn invoices_mark_invoice_status(
     configuration: &configuration::Configuration,
     params: InvoicesMarkInvoiceStatusParams,
-) -> Result<models::InvoiceData, Error<InvoicesMarkInvoiceStatusError>> {
+) -> Result<models::InvoiceData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}/status",
         configuration.base_path,
@@ -711,7 +609,7 @@ pub async fn invoices_mark_invoice_status(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesMarkInvoiceStatusError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -724,7 +622,7 @@ pub async fn invoices_mark_invoice_status(
 pub async fn invoices_refund(
     configuration: &configuration::Configuration,
     params: InvoicesRefundParams,
-) -> Result<models::PullPaymentData, Error<InvoicesRefundError>> {
+) -> Result<models::PullPaymentData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}/refund",
         configuration.base_path,
@@ -771,7 +669,7 @@ pub async fn invoices_refund(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesRefundError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -784,7 +682,7 @@ pub async fn invoices_refund(
 pub async fn invoices_unarchive_invoice(
     configuration: &configuration::Configuration,
     params: InvoicesUnarchiveInvoiceParams,
-) -> Result<models::InvoiceData, Error<InvoicesUnarchiveInvoiceError>> {
+) -> Result<models::InvoiceData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}/unarchive",
         configuration.base_path,
@@ -830,7 +728,7 @@ pub async fn invoices_unarchive_invoice(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesUnarchiveInvoiceError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -843,7 +741,7 @@ pub async fn invoices_unarchive_invoice(
 pub async fn invoices_update_invoice(
     configuration: &configuration::Configuration,
     params: InvoicesUpdateInvoiceParams,
-) -> Result<models::InvoiceData, Error<InvoicesUpdateInvoiceError>> {
+) -> Result<models::InvoiceData, Error<BtcPayError>> {
     let uri_str = format!(
         "{}/api/v1/stores/{storeId}/invoices/{invoiceId}",
         configuration.base_path,
@@ -888,7 +786,7 @@ pub async fn invoices_update_invoice(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<InvoicesUpdateInvoiceError> = serde_json::from_str(&content).ok();
+        let entity: Option<BtcPayError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

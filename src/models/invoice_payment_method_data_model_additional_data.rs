@@ -25,13 +25,13 @@ pub struct InvoicePaymentMethodDataModelAdditionalData {
     pub account_derivation: Option<String>,
     /// The recommended fee rate for this payment method.
     #[serde(rename = "recommendedFeeRate", skip_serializing_if = "Option::is_none")]
-    pub recommended_fee_rate: Option<String>,
+    pub recommended_fee_rate: Option<f64>,
     /// The fee rate charged to the user as `PaymentMethodFee`.
     #[serde(
         rename = "paymentMethodFeeRate",
         skip_serializing_if = "Option::is_none"
     )]
-    pub payment_method_fee_rate: Option<String>,
+    pub payment_method_fee_rate: Option<f64>,
     /// The provided comment to a LNUrl payment with comments enabled
     #[serde(
         rename = "providedComment",

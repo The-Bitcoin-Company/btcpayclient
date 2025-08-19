@@ -1,11 +1,28 @@
 use std::error;
 use std::fmt;
 
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::models;
+
 #[derive(Debug, Clone)]
 pub struct ResponseContent<T> {
     pub status: reqwest::StatusCode,
     pub content: String,
     pub entity: Option<T>,
+}
+
+/// struct for typed errors of all endpoints
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum BtcPayError {
+    Status400(Vec<models::ValidationProblemDetailsInner>),
+    Status401(models::ProblemDetails),
+    Status403(),
+    Status404(),
+    DefaultResponse(models::ProblemDetails),
+    UnknownValue(serde_json::Value),
 }
 
 #[derive(Debug)]
