@@ -21,6 +21,7 @@ pub enum BtcPayError {
     Status401(models::ProblemDetails),
     Status403(),
     Status404(),
+    Status409(),
     DefaultResponse(models::ProblemDetails),
     UnknownValue(serde_json::Value),
 }
